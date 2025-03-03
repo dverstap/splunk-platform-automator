@@ -1,6 +1,11 @@
 ---
 # This playbook disables selinux
 
+- name: Print disable_selinux
+  ansible.builtin.debug:
+    var: disable_selinux
+  when: true
+
 - name: check SELinux state
   shell: which getenforce > /dev/null 2>&1 && getenforce
   check_mode: no
@@ -8,6 +13,11 @@
   failed_when: "selinux_state.rc > 1"
   register: selinux_state
   when: disable_selinux|default(false) == true
+
+- name: Print selinux_state
+  ansible.builtin.debug:
+    var: selinux_state
+  when: true
 
 - name: disable SELinux
   tags:

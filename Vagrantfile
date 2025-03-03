@@ -402,7 +402,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Create host_vars dir for this host with ssh infos
       if provider == "virtualbox"
         srv.trigger.after :up do |trigger|
-          trigger.info = "Update local Ansible inventory"
+          trigger.info = "Update local Ansible inventory (virtualbox)"
           trigger.ruby do |env,machine|
             network_info = {}
             network_info['ip_addr'] = network[machine.name.to_s]['ip_addr']
@@ -448,7 +448,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           destroy_trigger.push(File.join(splunk_apps['splunk_save_baseconfig_apps_dir'],server['name']))
         end
         if destroy_trigger.length > 0
-          trigger.info = "Update local Ansible inventory"
+          trigger.info = "Update local Ansible inventory (destroy)"
           trigger.ruby do |env,machine|
             FileUtils.rm_rf(destroy_trigger.join(' '))
             hosts_file = File.join(inventory_dir, "hosts")
@@ -469,9 +469,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         end
       end
 
+      #print special_host_vars
       # Allow remote commands, for example workaround for missing python in ubuntu/xenial64
       # Use this command to install python: 'which python || sudo apt-get -y install python'
       if special_host_vars[server['name']]['os'].has_key?("remote_command")
+        #print "#{special_host_vars[server['name']]['os']['remote_command']}"
         srv.vm.provision "shell", inline: "#{special_host_vars[server['name']]['os']['remote_command']}"
       end
 
