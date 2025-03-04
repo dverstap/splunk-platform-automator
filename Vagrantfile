@@ -374,7 +374,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           #override.vm.box = server['box']['vb']
           vb.memory = special_host_vars[server['name']]['virtualbox']['memory']
           vb.cpus = special_host_vars[server['name']]['virtualbox']['cpus']
-
+          # Remove vbox configuration warnings; also fixes reboots that hang:
+          vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+          vb.customize ["modifyvm", :id, "--vram", "16"]
+          vb.customize ["modifyvm", :id, "--vrde", "off"]
 # If we need a second disk for testing
 #
 #        if not File.exists?(dataDisk1)
@@ -474,7 +477,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Use this command to install python: 'which python || sudo apt-get -y install python'
       if special_host_vars[server['name']]['os'].has_key?("remote_command")
         #print "#{special_host_vars[server['name']]['os']['remote_command']}"
-        srv.vm.provision "shell", inline: "#{special_host_vars[server['name']]['os']['remote_command']}"
+        srv.vm.provision "shell" do |s|
+          s.inline = special_host_vars[server['name']]['os']['remote_command']
+          s.reboot = true
+        end
       end
 
       #print "Special host vars:\n"

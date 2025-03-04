@@ -15,7 +15,7 @@ virtualbox:
 # - solved: python must be installed
 # - solved: selinux must be disabled
 # - graphics device sometimes breaks boot (working config: display-server disabled, device=VMSVGA, ram=16MB)
-# - first reboot of splunkd seems to hang, after the splunk_software role, in: RUNNING HANDLER [splunk_common : restart splunk]
+# - first restart of splunkd seems to hang, after the splunk_software role, in: RUNNING HANDLER [splunk_common : restart splunk]
 #   workaround: reboot the VM and start the ansible run again
 # - need to add port forwarding in vagrant: 8000 to 8000, but can do that for only one vm of course!
 #   workaround: add port forward by hand in vbox
@@ -29,8 +29,10 @@ os:
     dnf install -y python39 &&
     setenforce 0 &&
     sed -i s/enforcing/disabled/g /etc/selinux/config
+  # Rebooting at the end breaks ansible ssh access for some reason:
+  # && reboot
   # Used as a host var when running ansible:
-  # but that still does not work because of the python selinux package that is missing
+  # but that still does not work because of the python selinux package that is missing for python39
   # and is hard to install => workaround see above
   disable_selinux: true
 
